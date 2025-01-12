@@ -1,74 +1,28 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 
 <head>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3585621886948120"
-     crossorigin="anonymous"></script>
-     
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
-    <style>
-        .customoverlay {
-            background-color: #eef3fd;
-            border: #536AFF solid 1px;
-            border-radius: 5px;
-            color: #536AFF;
-            font-size: 13px;
-            font-weight: 600;
-            height: auto;
-            letter-spacing: -0.25px;
-            margin-top: 6.8px;
-            padding: 5px 11px;
-            position: relative;
-            width: fit-content;
-            z-index: 100;
-            top:-24px;
-        }
-        .customoverlay:hover
-        {
-            background-color: #CBDBFC;
-        }
-        .customoverlay:after {
-            border-color: #eef3fd transparent;
-            border-style: solid;
-            border-width: 8px 6.5px 0 6px;
-            content: '';
-            display: block;
-            position: absolute;
-            top: 26px;
-            z-index: 1;
-            left: 50%;
-            margin-left:-6px;
-        }
-        .customoverlay:hover:after        
-        {
-            border-color: #CBDBFC transparent;
-        }
-        .customoverlay:before {
-            border-color: #536AFF transparent;
-            border-style: solid;
-            border-width: 8px 6.5px 0 6px;
-            content: '';
-            display: block;
-            position: absolute;
-            top: 27.5px;
-            z-index: 0;            
-            left: 50%;
-            margin-left:-6px;
-        }
+    <title>Company Map</title>
 
-        html,
-        body {
-            padding: 0;
+    <!-- Kakao Maps SDK -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3585621886948120" crossorigin="anonymous"></script>
+	<!-- Appkey has domain limit setting so there is no security issue-->
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=a9517e460aa86036c7478c3d083449e3&libraries=services,clusterer,drawing"></script>
+
+    <style>
+        /* General Styles */
+        html, body {
             margin: 0;
+            padding: 0;
         }
 
         #companies-search {
             width: 18%;
             height: 100vh;
             float: left;
-            -ms-overflow-style: none; /* for Internet Explorer, Edge */
-            scrollbar-width: none; /* for Firefox */
             overflow-y: scroll;
         }
 
@@ -82,36 +36,20 @@
             left: 0;
             right: 0;
             height: 80px;
-            width: inherit;
             background-color: white;
         }
 
-        #search-name {
+        #search-name, #search-business-group {
             width: 85%;
-            min-width: 80%;
-            height: 30px;
-            font-size: 14px;
-            margin: 15px 10px 5px 10px;
-            padding: 0px 10px 0px 10px;
+            margin: 15px 10px;
             border-radius: 10px;
-            border:none;
-            background-color: rgb(235,235,235);
-            outline-color: #daa520;
-        }
-
-        #search-business-group {
-            width: 85%;
-            min-width: 80%;
-            height: 24px;
-            margin: 5px 10px 5px 10px;
-            padding: 0px 5px 0px 5px;
-            border-radius: 10px;
+            border: none;
+            padding: 0px 10px;
+            background-color: rgb(235, 235, 235);
         }
 
         #company-list {
             padding-top: 80px;
-            border: medium;
-            font-family: "Noto Sans KR", sans-serif;
         }
 
         .company-info {
@@ -124,18 +62,7 @@
         .company-name {
             font-size: 20px;
             font-weight: bold;
-            margin: 2px 0px 2px 0px;
             color: #daa520;
-        }
-
-        .company-location {
-            font-size: 12px;
-            margin: 2px 0px 2px 0px;
-        }
-
-        .company-business-group {
-            font-size: 12px;
-            margin: 12px 0px 0px 0px;
         }
 
         #map {
@@ -144,101 +71,53 @@
             float: right;
         }
 
-        @media screen and (max-width: 500px) {
-            html,
-            body {
-                padding: 0;
-                margin: 0;
-            }
+        /* Custom Overlay Style */
+        .customoverlay {
+            background-color: #eef3fd;
+            border: #536AFF solid 1px;
+            border-radius: 5px;
+            color: #536AFF;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 5px 11px;
+            position: relative;
+        }
 
-            #companies-search {
-                width: 100%;
-                height: 38vh;
-                position: absolute;
-                bottom: 0;
-                -ms-overflow-style: none;
-                scrollbar-width: none;
-                overflow-y: scroll;
-                z-index: 99;
-            }
+        .customoverlay:hover {
+            background-color: #CBDBFC;
+        }
 
-            #companies-search::-webkit-scrollbar {
-                display: none;
-            }
+        .customoverlay:after, .customoverlay:before {
+            content: '';
+            display: block;
+            position: absolute;
+            left: 50%;
+            margin-left: -6px;
+        }
 
-            #search {
-                position:sticky;
-                height: 80px;
-                width: 100%;
-                background-color: white;
-            }
+        .customoverlay:after {
+            border-color: #eef3fd transparent;
+            border-width: 8px 6.5px 0;
+            top: 26px;
+        }
 
-            #search-name {
-                width: 85%;
-                min-width: 80%;
-                height: 30px;
-                font-size: 14px;
-                margin: 15px 10px 5px 10px;
-                padding: 0px 10px 0px 10px;
-                border-radius: 10px;
-                border: none;
-                background-color: rgb(235, 235, 235);
-                outline-color: #daa520;
-            }
+        .customoverlay:hover:after {
+            border-color: #CBDBFC transparent;
+        }
 
-            #search-business-group {
-                width: 85%;
-                min-width: 80%;
-                height: 24px;
-                margin: 5px 10px 5px 10px;
-                padding: 0px 5px 0px 5px;
-                border-radius: 10px;
-            }
-
-            #company-list {
-                padding-top: 0px;
-                border: medium;
-                font-family: "Noto Sans KR", sans-serif;
-            }
-
-            .company-info {
-                padding: 10px;
-                border-bottom: 1px solid rgb(245, 245, 245);
-                font-size: 12px;
-                cursor: pointer;
-            }
-
-            .company-name {
-                font-size: 20px;
-                font-weight: bold;
-                margin: 2px 0px 2px 0px;
-                color: #daa520;
-            }
-
-            .company-location {
-                font-size: 12px;
-                margin: 2px 0px 2px 0px;
-            }
-
-            .company-business-group {
-                font-size: 12px;
-                margin: 12px 0px 0px 0px;
-            }
-
-            #map {
-                width: 100%;
-                height: 62vh;
-                top: 0;
-            }
+        .customoverlay:before {
+            border-color: #536AFF transparent;
+            border-width: 8px 6.5px 0;
+            top: 27.5px;
         }
     </style>
 </head>
 
 <body>
-    <div id="companies-search" style="overflow-y: scroll; overflow-x: hidden;">
+    <!-- Company Search Sidebar -->
+    <div id="companies-search">
         <div id="search">
             <input id="search-name" placeholder="회사명 검색" onkeyup="filterCompanies()" />
-        
             <select id="search-business-group" onchange="filterCompanies()">
                 <option value="">산업군 선택</option>
             </select>
@@ -246,118 +125,83 @@
         <div id="company-list"></div>
     </div>
 
+    <!-- Map Container -->
     <div id="map"></div>
 
+    <!-- Scripts -->
     <script src="http://code.jquery.com/jquery-latest.js"></script>
-    <script type="text/javascript"
-        src="//dapi.kakao.com/v2/maps/sdk.js?appkey=a9517e460aa86036c7478c3d083449e3&libraries=services,clusterer,drawing"></script>
+
     <script>
-        // map 이라는 이름을 가진 element 가져오기
-        var mapContainer = document.getElementById('map')
-        // 서울~분당 보이는 적절한 시작 위치 설정
+        // Kakao Map Initialization
+        var mapContainer = document.getElementById('map');
         var mapOption = {
             center: new kakao.maps.LatLng(37.4593, 127.074),
             level: 8
         };
-
-        // kakao map api를 이용해 map 생성
         var map = new kakao.maps.Map(mapContainer, mapOption);
-
-        // 지도 타입 컨트롤 생성/추가 [일반/스카이뷰]
         var mapTypeControl = new kakao.maps.MapTypeControl();
         map.addControl(mapTypeControl, kakao.maps.ControlPosition.TOPRIGHT);
-
-        // 확대 축소 컨트롤 생성/추가
         var zoomControl = new kakao.maps.ZoomControl();
         map.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT);
 
-        // 여기서 파라메터 companies.json 통째로
+        // Fetch and Display Companies
         $.getJSON("companies.json", function (data) {
             makeClusterer(data);
+            populateCompanyList(data.companies);
         });
 
-        // data = companies
         function makeClusterer(data) {
-            // 클러스터 추가
             var clusterer = new kakao.maps.MarkerClusterer({
                 map: map,
                 averageCenter: true,
                 minLevel: 5
             });
 
-            // 회사 리스트 불러와 마커 생성 후 클러스터에 추가
-            var coords = {};
             var geocoder = new kakao.maps.services.Geocoder();
+            var coords = {};
             var companies = data.companies;
             var total = companies.length;
             var counter = 0;
 
             companies.forEach(function (company) {
-                // 비동기 addressSearch 함수 내부에서 계산한 값 기록을 위해 아래와 같은 패턴 사용
-                // ref : https://devtalk.kakao.com/t/topic/57418
                 geocoder.addressSearch(company.location, function (data, status) {
                     if (status === kakao.maps.services.Status.OK) {
                         coords[company.location] = data[0];
                     }
-
                     counter++;
-
                     if (total === counter) {
-                        var markers = [];
-
-                        companies.forEach(function (company) {
-                            if (coords[company.location]) {
-                                var pos = new kakao.maps.LatLng(coords[company.location].y, coords[company.location].x);
-
-                                var marker = new kakao.maps.Marker({
-                                    position: pos
-                                });
-
-                                kakao.maps.event.addListener(marker, 'click', function(){
-                                    var link = company.recruitUrl;
-                                    window.open(link);
-                                });
-
-                                markers.push(marker);
-
-                                var content = `<div class="customoverlay">${company.name}</div>`;
-
-                                const overlay = new kakao.maps.CustomOverlay({
-                                    content,
-                                    map: this.map,
-                                    position: pos,
-                                    yAnchor: 2.1,
-                                });
-
-                                kakao.maps.event.addListener(this.map, 'zoom_changed', () => {
-                                    let level = this.map.getLevel();
-                                    if (level < 5) {
-                                    overlay.setMap(this.map);
-                                    } else {
-                                    overlay.setMap(null);
-                                    }
-                                });
-
-                                overlay.setMap(null);
-                            }
-                        });
-
-                        clusterer.addMarkers(markers);
+                        addMarkersToCluster(companies, coords, clusterer);
                     }
                 });
             });
         }
-    </script>
 
-    <script type="text/javascript"></script>
-    <script>
-        const companyList = document.getElementById('company-list');
-        const tempBusinessGroupList = new Array();
+        function addMarkersToCluster(companies, coords, clusterer) {
+            var markers = [];
+            companies.forEach(function (company) {
+                if (coords[company.location]) {
+                    var pos = new kakao.maps.LatLng(coords[company.location].y, coords[company.location].x);
+                    var marker = new kakao.maps.Marker({ position: pos });
+                    var content = `<div class="customoverlay">${company.name}</div>`;
+                    var overlay = new kakao.maps.CustomOverlay({ content, map: map, position: pos, yAnchor: 2.1 });
 
-        $.getJSON("companies.json", function (json) {
-            var companies = json.companies;
+                    marker.addListener('click', function () {
+                        window.open(company.recruitUrl);
+                    });
 
-            for (i = 0; i < companies.length; i++) {
+                    markers.push(marker);
+                    overlay.setMap(null);
+                }
+            });
+            clusterer.addMarkers(markers);
+        }
+
+        // Populate Company List
+        function populateCompanyList(companies) {
+            const companyList = document.getElementById('company-list');
+            const tempBusinessGroupList = [];
+
+            companies.forEach(function (company) {
                 var companyInfoSection = document.createElement("section");
                 companyInfoSection.className = 'company-info';
                 companyInfoSection.tabIndex = "0";
@@ -365,83 +209,68 @@
 
                 var companyNameDiv = document.createElement("div");
                 companyNameDiv.className = 'company-name';
-                companyNameDiv.innerHTML = companies[i].name;
+                companyNameDiv.innerHTML = company.name;
                 companyInfoSection.appendChild(companyNameDiv);
 
                 var companyLocationDiv = document.createElement("div");
                 companyLocationDiv.className = 'company-location';
-                companyLocationDiv.innerHTML = companies[i].location;
+                companyLocationDiv.innerHTML = company.location;
                 companyInfoSection.appendChild(companyLocationDiv);
 
-                var companybusinesGroupDiv = document.createElement("div");
-                companybusinesGroupDiv.className = 'company-business-group';
-                companybusinesGroupDiv.innerHTML = companies[i].businessGroup;
-                companyInfoSection.appendChild(companybusinesGroupDiv);
+                var companyBusinessGroupDiv = document.createElement("div");
+                companyBusinessGroupDiv.className = 'company-business-group';
+                companyBusinessGroupDiv.innerHTML = company.businessGroup;
+                companyInfoSection.appendChild(companyBusinessGroupDiv);
 
                 companyList.appendChild(companyInfoSection);
+                tempBusinessGroupList.push(company.businessGroup);
+            });
 
-                tempBusinessGroupList.push(companies[i].businessGroup);
-            }
+            populateBusinessGroupSelect(tempBusinessGroupList);
+        }
 
-            // 산업군 필터링 컨트롤 Init
+        function populateBusinessGroupSelect(groups) {
             var businessGroupList = document.getElementById('search-business-group');
-            const set = new Set(tempBusinessGroupList.sort());
+            const set = new Set(groups.sort());
 
-            for (let item of set) {
+            set.forEach(function (item) {
                 var option = document.createElement('option');
                 option.value = item;
                 option.text = item;
-
                 businessGroupList.add(option, null);
-            }
-        });
+            });
+        }
 
-        // 선택한 회사 위치로 맵 중심 이동
+        // Move Map to Company Location
         function moveToCompanyLocation() {
             var location = this.querySelector('.company-location').textContent;
-
             var geocoder = new kakao.maps.services.Geocoder();
 
             geocoder.addressSearch(location, function (position, status) {
                 if (status === kakao.maps.services.Status.OK) {
                     var coords = new kakao.maps.LatLng(position[0].y, position[0].x);
-
-                    this.map.setLevel(4);
-
+                    map.setLevel(4);
                     map.setCenter(coords);
                 }
             });
         }
-    </script>
 
-    <script type="text/javascript">
-        // 검색 조건 변경 시 회사를 필터링
+        // Filter Companies Based on Search Criteria
         function filterCompanies() {
-            // 기업 리스트의 각 항목
             var companyList = document.getElementsByClassName('company-info');
-            
-            // 검색 입력값과 선택된 산업군 값을 가져옴
             var searchName = document.getElementById('search-name').value.toUpperCase();
             var selectedBusinessGroup = document.getElementById('search-business-group').value;
 
-            // 기업 리스트를 하나씩 확인하며 조건에 따라 표시/숨김 처리
-            for (var i = 0; i < companyList.length; i++) {
-                // 현재 기업의 이름과 산업군 정보를 가져옴
-                var name = companyList[i].getElementsByClassName('company-name');
-                var businessGroup = companyList[i].getElementsByClassName('company-business-group');
+            Array.from(companyList).forEach(function (company) {
+                var name = company.getElementsByClassName('company-name')[0].innerHTML.toUpperCase();
+                var businessGroup = company.getElementsByClassName('company-business-group')[0].innerHTML;
 
-                // 이름 검색 조건과 산업군 조건에 맞는지 검사
-                if (name[0].innerHTML.toUpperCase().indexOf(searchName) > -1) {
-                    // 산업군이 선택되었을 때, 조건을 추가로 확인
-                    if (selectedBusinessGroup && businessGroup[0].innerHTML !== selectedBusinessGroup) {
-                        companyList[i].style.display = "none"; // 조건 불일치 시 숨김
-                    } else {
-                        companyList[i].style.display = "block"; // 조건 일치 시 표시
-                    }
+                if (name.indexOf(searchName) > -1 && (!selectedBusinessGroup || businessGroup === selectedBusinessGroup)) {
+                    company.style.display = "block";
                 } else {
-                    companyList[i].style.display = "none"; // 이름 조건 불일치 시 숨김
+                    company.style.display = "none";
                 }
-            }
+            });
         }
     </script>
 </body>
