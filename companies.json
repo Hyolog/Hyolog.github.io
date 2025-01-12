@@ -1,0 +1,34 @@
+{
+    "companies": [
+      {
+        "name": "(주)엑스엘게임즈",
+        "location": "경기 성남시 분당구 대왕판교로645번길 14, 7층,8층",
+        "businessGroup": "게임임",
+        "recruitUrl": "https://xlgames.recruiter.co.kr/app/jobnotice/view?systemKindCode=MRS1&jobnoticeSn=25228"
+      },
+      {
+        "name": "(주)플레이오토",
+        "location": "서울 구로구 디지털로26길 123, 14층",
+        "businessGroup": "서비스업",
+        "recruitUrl": "https://www.playauto.co.kr/com/recruit_apply.html?num=33"
+      },
+      {
+        "name": "(주)넥슨코리아",
+        "location": "경기 성남시 분당구 판교로256번길 7",
+        "businessGroup": "게임임",
+        "recruitUrl": "http://company.nexon.com/404_error.aspx?aspxerrorpath=/Careers/Notice/View.aspx"
+      },
+      {
+        "name": "넷마블(주)",
+        "location": "서울 구로구 디지털로26길 38",
+        "businessGroup": "게임임",
+        "recruitUrl": "https://company.netmarble.com/rem/www/notice.jsp?anno_id=1757858&annotype=all"
+      },
+      {
+        "name": "(주)위메프",
+        "location": "서울 강남구 영동대로 502",
+        "businessGroup": "전자상거래",
+        "recruitUrl": "https://www.wanted.co.kr/wd/22834"
+      }
+    ]
+}
