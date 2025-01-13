@@ -293,6 +293,8 @@
             });
         }
 
+        let currentCircle = null; // 현재 표시된 원을 저장할 변수
+
         // Move Map to Company Location
         function moveToCompanyLocation() {
             var location = this.querySelector('.company-location').textContent;
@@ -303,6 +305,25 @@
                     var coords = new kakao.maps.LatLng(position[0].y, position[0].x);
                     map.setLevel(4);
                     map.setCenter(coords);
+
+                    if (currentCircle) {
+                        currentCircle.setMap(null);
+                    }
+
+                    var circle = new kakao.maps.Circle({
+                        center: coords,  // 원의 중심좌표
+                        radius: 80,      // 원의 반지름 (미터 단위)
+                        strokeWeight: 5, // 선의 두께
+                        strokeColor: '#DAA520', // 선의 색깔 (골드 색상)
+                        strokeOpacity: 0.9, // 선의 불투명도
+                        strokeStyle: 'solid', // 선의 스타일
+                        fillColor: '#FFF8DC', // 채우기 색깔 (연한 골드 색상)
+                        fillOpacity: 0.5 // 채우기 불투명도
+                    });
+
+                    // 지도에 원을 표시합니다 
+                    circle.setMap(map); 
+                    currentCircle = circle;
                 }
             });
         }
