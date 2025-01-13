@@ -110,10 +110,41 @@
             border-width: 8px 6.5px 0;
             top: 27.5px;
         }
+
+        #loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .spinner {
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid #daa520;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 
 <body>
+    <!-- Busy Indicator-->
+    <div id="loading" style="display: none;">
+        <div class="spinner"></div>
+    </div>
     <!-- Company Search Sidebar -->
     <div id="companies-search">
         <div id="search">
@@ -151,6 +182,9 @@
         });
 
         function makeClusterer(data) {
+            //비지인디케이터 설정정
+            document.getElementById('loading').style.display = 'flex';
+
             var clusterer = new kakao.maps.MarkerClusterer({
                 map: map,
                 averageCenter: true,
@@ -158,22 +192,36 @@
             });
 
             var geocoder = new kakao.maps.services.Geocoder();
-            var coords = {};
             var companies = data.companies;
             var total = companies.length;
-            var counter = 0;
+            var coords = {};
+            var requestInterval = 2;  // 2ms 간격으로 요청을 보냄
+            var index = 0;  // 현재 처리할 회사 인덱스
 
-            companies.forEach(function (company) {
-                geocoder.addressSearch(company.location, function (data, status) {
-                    if (status === kakao.maps.services.Status.OK) {
-                        coords[company.location] = data[0];
-                    }
-                    counter++;
-                    if (total === counter) {
-                        addMarkersToCluster(companies, coords, clusterer);
-                    }
-                });
-            });
+            // 순차적으로 요청을 보내는 함수
+            function sendNextRequest() {
+                if (index < total) {
+                    var company = companies[index];
+                    geocoder.addressSearch(company.location, function (data, status) {
+                        if (status === kakao.maps.services.Status.OK) {
+                            coords[company.location] = data[0];
+                        }
+
+                        // 요청 간에 간격을 두고 다음 요청을 보냄
+                        index++;
+                        setTimeout(sendNextRequest, requestInterval);
+                    });
+                } else {
+                    // 모든 요청이 끝난 후 마커를 클러스터에 추가
+                    addMarkersToCluster(companies, coords, clusterer);
+                    
+                    //비지인디케이터 숨기기
+                    document.getElementById('loading').style.display = 'none';
+                }
+            }
+
+            // 첫 번째 요청을 시작
+            sendNextRequest();
         }
 
         function addMarkersToCluster(companies, coords, clusterer) {
