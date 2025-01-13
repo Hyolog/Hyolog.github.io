@@ -182,7 +182,7 @@
         });
 
         function makeClusterer(data) {
-            //비지인디케이터 설정정
+            // 비지인디케이터 설정
             document.getElementById('loading').style.display = 'flex';
 
             var clusterer = new kakao.maps.MarkerClusterer({
@@ -195,29 +195,40 @@
             var companies = data.companies;
             var total = companies.length;
             var coords = {};
-            var requestInterval = 2;  // 2ms 간격으로 요청을 보냄
-            var index = 0;  // 현재 처리할 회사 인덱스
+            var requestInterval = 100; // 요청 간격
+            var chunkSize = 20; // 한 번에 보낼 회사 수 (10개씩)
+            var currentIndex = 0; // 현재 처리할 회사 인덱스
 
             // 순차적으로 요청을 보내는 함수
             function sendNextRequest() {
-                if (index < total) {
-                    var company = companies[index];
+                // 남은 회사가 없으면 종료
+                if (currentIndex >= total) {
+                    // 모든 요청이 끝난 후 마커를 클러스터에 추가
+                    addMarkersToCluster(companies, coords, clusterer);
+                    // 비지인디케이터 숨기기
+                    document.getElementById('loading').style.display = 'none';
+                    return;
+                }
+
+                // 10개씩 묶어서 요청
+                var chunk = companies.slice(currentIndex, currentIndex + chunkSize);
+                currentIndex += chunkSize;
+
+                var requestsRemaining = chunk.length;
+                chunk.forEach(function (company) {
                     geocoder.addressSearch(company.location, function (data, status) {
                         if (status === kakao.maps.services.Status.OK) {
                             coords[company.location] = data[0];
                         }
+                        requestsRemaining--;
 
-                        // 요청 간에 간격을 두고 다음 요청을 보냄
-                        index++;
-                        setTimeout(sendNextRequest, requestInterval);
+                        // 모든 요청이 끝났으면
+                        if (requestsRemaining === 0) {
+                            // 다음 묶음을 요청하기 전에 간격을 둠
+                            setTimeout(sendNextRequest, requestInterval);
+                        }
                     });
-                } else {
-                    // 모든 요청이 끝난 후 마커를 클러스터에 추가
-                    addMarkersToCluster(companies, coords, clusterer);
-                    
-                    //비지인디케이터 숨기기
-                    document.getElementById('loading').style.display = 'none';
-                }
+                });
             }
 
             // 첫 번째 요청을 시작
