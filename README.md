@@ -3,4 +3,6 @@
 
  
 ## Description
+- .NET 기술을 사용하는 기업들의 분포를 지도에서 확인할 수 있습니다.
+- 지도에서 마커를 클릭하면 채용 공고 페이지를 확인할 수 있습니다.
 - 기여는 [.NET 기술을 사용하는 국내 기업 정보](https://github.com/Hyolog/list-of-companies-using-dotnet)를 통해 부탁드립니다.
