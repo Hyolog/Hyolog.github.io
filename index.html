@@ -5,15 +5,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
-    <title>Company Map</title>
+    <title>Dotnet Company Map</title>
 
     <!-- Kakao Maps SDK -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3585621886948120" crossorigin="anonymous"></script>
 	<!-- Appkey has domain limit setting so there is no security issue-->
     <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=a9517e460aa86036c7478c3d083449e3&libraries=services,clusterer,drawing"></script>
 
     <style>
-        /* General Styles */
         html, body {
             margin: 0;
             padding: 0;
@@ -41,13 +39,13 @@
             box-sizing: border-box;  
             border-radius: 10px;
             border: none;
-            background-color: rgb(235, 235, 235);
+            background-color: #ebebeb;
             margin-bottom: 5px;
         }
 
         .company-info {
             padding: 10px;
-            border-bottom: 1px solid rgb(245, 245, 245);
+            border-bottom: 1px solid #f5f5f5;
             font-size: 12px;
             cursor: pointer;
         }
@@ -64,7 +62,6 @@
             float: right;
         }
 
-        /* Custom Overlay Style */
         .customoverlay {
             background-color: #eef3fd;
             border: #536AFF solid 1px;
@@ -138,12 +135,13 @@
     <div id="loading" style="display: none;">
         <div class="spinner"></div>
     </div>
+
     <!-- Company Search Sidebar -->
     <div id="companies-search">
         <div id="search">
             <input id="search-name" placeholder="회사명 검색" onkeyup="filterCompanies()" />
             <select id="search-business-group" onchange="filterCompanies()">
-                <option value="">산업군 선택</option>
+                <option value="">업종 선택</option>
             </select>
         </div>
         <div id="company-list"></div>
@@ -170,12 +168,14 @@
 
         // Fetch and Display Companies
         $.getJSON("companies.json", function (data) {
+            data.companies.sort((a, b) => a.name.localeCompare(b.name));
+
             makeClusterer(data);
             populateCompanyList(data.companies);
         });
 
         function makeClusterer(data) {
-            // 비지인디케이터 설정
+            // Show busy indicator
             document.getElementById('loading').style.display = 'flex';
 
             var clusterer = new kakao.maps.MarkerClusterer({
@@ -188,22 +188,18 @@
             var companies = data.companies;
             var total = companies.length;
             var coords = {};
-            var requestInterval = 100; // 요청 간격
-            var chunkSize = 20; // 한 번에 보낼 회사 수 (10개씩)
-            var currentIndex = 0; // 현재 처리할 회사 인덱스
+            var requestInterval = 100; // Request interval
+            var chunkSize = 20; // Number of companies to process per batch
+            var currentIndex = 0; // Current company index to process
 
-            // 순차적으로 요청을 보내는 함수
+            // Function to send requests sequentially
             function sendNextRequest() {
-                // 남은 회사가 없으면 종료
                 if (currentIndex >= total) {
-                    // 모든 요청이 끝난 후 마커를 클러스터에 추가
                     addMarkersToCluster(companies, coords, clusterer);
-                    // 비지인디케이터 숨기기
                     document.getElementById('loading').style.display = 'none';
                     return;
                 }
 
-                // 10개씩 묶어서 요청
                 var chunk = companies.slice(currentIndex, currentIndex + chunkSize);
                 currentIndex += chunkSize;
 
@@ -215,16 +211,13 @@
                         }
                         requestsRemaining--;
 
-                        // 모든 요청이 끝났으면
                         if (requestsRemaining === 0) {
-                            // 다음 묶음을 요청하기 전에 간격을 둠
                             setTimeout(sendNextRequest, requestInterval);
                         }
                     });
                 });
             }
 
-            // 첫 번째 요청을 시작
             sendNextRequest();
         }
 
@@ -248,7 +241,6 @@
             clusterer.addMarkers(markers);
         }
 
-        // Populate Company List
         function populateCompanyList(companies) {
             const companyList = document.getElementById('company-list');
             const tempBusinessGroupList = [];
@@ -293,9 +285,8 @@
             });
         }
 
-        let currentCircle = null; // 현재 표시된 원을 저장할 변수
+        let currentCircle = null; // Variable to store the currently displayed circle
 
-        // Move Map to Company Location
         function moveToCompanyLocation() {
             var location = this.querySelector('.company-location').textContent;
             var geocoder = new kakao.maps.services.Geocoder();
@@ -311,24 +302,23 @@
                     }
 
                     var circle = new kakao.maps.Circle({
-                        center: coords,  // 원의 중심좌표
-                        radius: 80,      // 원의 반지름 (미터 단위)
-                        strokeWeight: 5, // 선의 두께
-                        strokeColor: '#DAA520', // 선의 색깔 (골드 색상)
-                        strokeOpacity: 0.9, // 선의 불투명도
-                        strokeStyle: 'solid', // 선의 스타일
-                        fillColor: '#FFF8DC', // 채우기 색깔 (연한 골드 색상)
-                        fillOpacity: 0.5 // 채우기 불투명도
+                        center: coords,
+                        radius: 80,
+                        strokeWeight: 5,
+                        strokeColor: '#DAA520',
+                        strokeOpacity: 0.9,
+                        strokeStyle: 'solid',
+                        fillColor: '#FFF8DC',
+                        fillOpacity: 0.5
                     });
 
-                    // 지도에 원을 표시합니다 
                     circle.setMap(map); 
                     currentCircle = circle;
                 }
             });
         }
 
-        // Filter Companies Based on Search Criteria
+
         function filterCompanies() {
             var companyList = document.getElementsByClassName('company-info');
             var searchName = document.getElementById('search-name').value.toUpperCase();
